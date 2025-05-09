@@ -1,9 +1,56 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+@using Microsoft.AspNetCore.Components.Routing
 
-<h1>Hello, world!</h1>
+<PageTitle>HRMS Dashboard</PageTitle>
 
-Welcome to your new app.
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 bg-light sidebar p-4 shadow-sm">
+            <h4 class="mb-4">HRMS Modules</h4>
+            <nav class="nav flex-column">
+                <NavLink href="/leave-types" class="nav-link" activeClass="active">
+                    <i class="bi bi-card-checklist me-2"></i> Leave Type Management
+                </NavLink>
+                <span class="nav-link text-muted">Employee Directory (Coming Soon)</span>
+                <span class="nav-link text-muted">Payroll Management (Coming Soon)</span>
+                <span class="nav-link text-muted">Attendance Tracking (Coming Soon)</span>
+            </nav>
+        </div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+        <!-- Main Dashboard -->
+        <div class="col-md-9 p-4">
+            <h1 class="display-5 mb-3">Welcome to HRMS</h1>
+            <p class="lead">Manage and streamline your human resource operations efficiently.</p>
+
+            <hr />
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Leave Type Management</h5>
+                    <p class="card-text">
+                        This module allows you to define and manage various types of leaves within your organization such as Sick Leave, Casual Leave, Paid Leave, etc.
+                        You can add, edit, delete, and list leave types as per your company's HR policies.
+                    </p>
+                    <a class="btn btn-primary" href="/leave-types">Go to Leave Types</a>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <strong>Tip:</strong> This dashboard will grow as you implement more modules. Keep the structure modular and scalable!
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sidebar {
+        min-height: 100vh;
+        border-right: 1px solid #dee2e6;
+    }
+    .nav-link.active {
+        font-weight: bold;
+        color: #0d6efd !important;
+    }
+</style>
