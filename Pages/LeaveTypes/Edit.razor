@@ -1,0 +1,72 @@
+@page "/leave-types/edit/{Id:int}"
+@inject ILeaveTypeService LeaveTypeService
+@inject NavigationManager Navigation
+@using HRMS.UI.Models.HRP
+@using Microsoft.AspNetCore.Components.Forms
+
+
+<h3>Edit Leave Type</h3>
+
+@if (leaveType == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="leaveType" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group mb-2">
+            <label>Name</label>
+            <InputText class="form-control" @bind-Value="leaveType.Name" />
+        </div>
+
+        <div class="form-group mb-2">
+            <label>Description</label>
+            <InputTextArea class="form-control" @bind-Value="leaveType.Description" />
+        </div>
+
+        <div class="form-group form-check mb-2">
+            <InputCheckbox class="form-check-input" @bind-Value="leaveType.IsPaid" />
+            <label class="form-check-label">Is Paid</label>
+        </div>
+
+        <div class="form-group form-check mb-3">
+            <InputCheckbox class="form-check-input" @bind-Value="leaveType.IsActive" />
+            <label class="form-check-label">Is Active</label>
+        </div>
+
+    <button type="submit" class="btn btn-success">Update</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private HRP_LeaveType leaveType;
+
+    protected override async Task OnInitializedAsync()
+    {
+        leaveType = await LeaveTypeService.GetByIdAsync(Id);
+        if (leaveType == null)
+        {
+            Navigation.NavigateTo("/leave-types"); // Redirect if not found
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await LeaveTypeService.UpdateAsync(leaveType);
+        Navigation.NavigateTo("/leave-types");
+    }
+
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/leave-types");
+    }
+}

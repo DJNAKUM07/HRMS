@@ -1,0 +1,44 @@
+# ------------------------------------
+# Build output
+# ------------------------------------
+bin/
+obj/
+
+# ------------------------------------
+# EF Core (optional: keep Migrations/ if tracking schema)
+# ------------------------------------
+# Uncomment if you want to ignore migrations (NOT recommended):
+# Migrations/
+
+# ------------------------------------
+# User/IDE settings
+# ------------------------------------
+.vscode/
+.idea/
+*.user
+*.suo
+*.sln.docstates
+
+# ------------------------------------
+# OS/System files
+# ------------------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------------------
+# ASP.NET / Blazor-specific
+# ------------------------------------
+wwwroot/**/*.map
+wwwroot/lib/             # if using LibMan or manually downloaded libs
+node_modules/            # if using npm for frontend packages
+
+# ------------------------------------
+# Logging / Cache
+# ------------------------------------
+*.log
+
+# ------------------------------------
+# Secrets / Local config
+# ------------------------------------
+appsettings.Development.json
+secrets.json

@@ -1,0 +1,50 @@
+@page "/leave-types"
+@inject ILeaveTypeService LeaveTypeService
+@inject NavigationManager Navigation
+
+<h3>Leave Types</h3>
+
+<button class="btn btn-primary mb-2" @onclick="@(() => Navigation.NavigateTo("/leave-types/create"))">Add Leave Type</button>
+
+@if (leaveTypes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Paid</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var type in leaveTypes)
+        {
+            <tr>
+                <td>@type.Name</td>
+                <td>@type.Description</td>
+                <td>@(type.IsPaid ? "Yes" : "No")</td>
+                <td>@(type.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a href="/leave-types/edit/@type.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="/leave-types/delete/@type.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<HRP_LeaveType> leaveTypes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        leaveTypes = await LeaveTypeService.GetAllAsync();
+    }
+}
