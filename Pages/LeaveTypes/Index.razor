@@ -2,6 +2,9 @@
 @inject ILeaveTypeService LeaveTypeService
 @inject NavigationManager Navigation
 
+<PageTitle>Leave Types</PageTitle>
+
+
 <h3>Leave Types</h3>
 
 <button class="btn btn-primary mb-2" @onclick="@(() => Navigation.NavigateTo("/leave-types/create"))">Add Leave Type</button>

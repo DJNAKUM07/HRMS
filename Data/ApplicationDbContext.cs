@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using HRMS.UI.Models.HRP; // Import the namespace for HRP_LeaveType
 
 namespace HRMS.UI.Data
