@@ -9,27 +9,43 @@ using HRMS.UI.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using HRMS.UI.Services;
 using HRMS.UI.Services.Interfaces;
-
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Configuration reference
+var config = builder.Configuration;
+
+// Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-
+    options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Razor + Blazor
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+// External Authentication Providers
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        var googleSection = config.GetSection("Authentication:Google");
+        options.ClientId = googleSection["ClientId"];
+        options.ClientSecret = googleSection["ClientSecret"];
+        options.CallbackPath = "/signin-google";
+    });
+
+
+// Scoped services
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-
 builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
-
 
 var app = builder.Build();
 
@@ -41,18 +57,16 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 app.MapBlazorHub();
@@ -78,6 +92,5 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine(ex.Message);
     }
 }
-
 
 app.Run();

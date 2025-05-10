@@ -7,11 +7,11 @@
 
 <EditForm Model="leaveType" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
     <div class="form-group mb-2">
         <label>Name</label>
         <InputText class="form-control" @bind-Value="leaveType.Name" />
+        <ValidationMessage For="@(() => leaveType.Name)" />
     </div>
 
     <div class="form-group mb-2">
