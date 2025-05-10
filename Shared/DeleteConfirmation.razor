@@ -1,6 +1,9 @@
 @typeparam TItem
+@using Blazored.Toast
+@using Microsoft.AspNetCore.Components.Web
 
-<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" role="dialog">
+<div @ref="modalRef" class="modal fade show d-block" tabindex="0" role="dialog" style="background-color: rgba(0,0,0,0.5);"
+     @onkeydown="HandleKeyDown">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,15 +15,41 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" @onclick="OnCancel">Cancel</button>
-                <button class="btn btn-danger" @onclick="OnConfirm">Yes, Delete</button>
+                <button class="btn btn-danger" @onclick="OnConfirmWithToast">Yes, Delete</button>
             </div>
         </div>
     </div>
 </div>
 
 @code {
+    [Inject] public IToastService ToastService { get; set; }
+
     [Parameter] public TItem Item { get; set; }
     [Parameter] public string ItemName { get; set; } = "this item";
     [Parameter] public EventCallback OnConfirm { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
+
+    private ElementReference modalRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await modalRef.FocusAsync(); // Focus to receive key events
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await OnCancel.InvokeAsync();
+        }
+    }
+
+    private async Task OnConfirmWithToast()
+    {
+        ToastService.ShowSuccess($"{ItemName} has been successfully deleted!");
+        await OnConfirm.InvokeAsync();
+    }
 }

@@ -1,12 +1,15 @@
-@* Reusable Generic View Modal *@
-
 @if (Fields is not null && Fields.Any())
 {
-    <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal fade show d-block"
+         tabindex="0"
+         role="dialog"
+         style="background-color: rgba(0, 0, 0, 0.5);"
+         @ref="modalDiv"
+         @onkeydown="HandleKeyDown">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content border-0 shadow-lg rounded-3">
                 <div class="modal-header bg-primary text-white rounded-top">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title d-flex align-items-center">
                         <i class="bi bi-eye-fill me-2"></i> @Title
                     </h5>
                     <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="Close"></button>
@@ -18,7 +21,7 @@
                         {
                             <div class="col-md-6">
                                 <div class="fw-semibold text-muted small mb-1">@field.Label</div>
-                                <div class="fs-5 text-break">@field.Value</div>
+                                <div class="fs-6 text-break border-bottom pb-2">@field.Value</div>
                             </div>
                         }
                     </div>
@@ -39,5 +42,23 @@
     [Parameter] public List<(string Label, string? Value)> Fields { get; set; } = new();
     [Parameter] public EventCallback OnClose { get; set; }
 
+    private ElementReference modalDiv;
+
     private async Task Close() => await OnClose.InvokeAsync();
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await Close();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await modalDiv.FocusAsync();
+        }
+    }
 }

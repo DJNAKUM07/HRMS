@@ -10,6 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 using HRMS.UI.Services;
 using HRMS.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Google;
+using Blazored.Toast;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 // Razor + Blazor
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddBlazoredToast();
+
 
 // External Authentication Providers
 builder.Services.AddAuthentication()

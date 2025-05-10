@@ -3,6 +3,8 @@
 
 @inject ILeaveTypeService LeaveTypeService
 @inject NavigationManager Navigation
+@inject Blazored.Toast.Services.IToastService ToastService
+
 
 <PageTitle>@(IsEdit ? $"Edit Leave Type - {LeaveType.Name}" : "Add Leave Type")</PageTitle>
 
@@ -82,13 +84,17 @@
         if (IsEdit)
         {
             await LeaveTypeService.UpdateAsync(LeaveType);
+            ToastService.ShowSuccess($"Leave type {LeaveType.Name} updated successfully!");
+            NavigateBack();
         }
         else
         {
             await LeaveTypeService.AddAsync(LeaveType);
+            ToastService.ShowSuccess($"Leave type {LeaveType.Name} created successfully!");
+            LeaveType = new HRP_LeaveType();
+            StateHasChanged();
+            
         }
-
-        NavigateBack();
     }
 
     private void NavigateBack()
