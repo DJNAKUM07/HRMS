@@ -4,50 +4,186 @@
 
 <PageTitle>Leave Types</PageTitle>
 
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Leave Types</h2>
+        <button class="btn btn-primary" @onclick="NavigateToCreate">
+            <i class="bi bi-plus-circle me-1"></i> Add Leave Type
+        </button>
+    </div>
 
-<h3>Leave Types</h3>
+    @if (isLoading)
+    {
+        <div class="alert alert-info">Loading leave types...</div>
+    }
+    else if (leaveTypes.Count == 0)
+    {
+        <div class="alert alert-warning">No leave types found.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle shadow-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th class="text-center">Paid</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center" style="width: 180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < leaveTypes.Count; i++)
+                    {
+                        var type = leaveTypes[i];
+                        <tr @key="type.Id">
+                            <td>@(i + 1)</td>
+                            <td>@type.Name</td>
+                            <td>@type.Description</td>
+                            <td class="text-center">
+                                <span class="badge bg-@(type.IsPaid ? "success" : "secondary")">
+                                    @(type.IsPaid ? "Yes" : "No")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-@(type.IsActive ? "success" : "danger")">
+                                    @(type.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => ShowDetails(type)">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                    <a class="btn btn-sm btn-outline-primary" href="@($"/leave-types/edit/{type.Id}")">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => PromptDelete(type)">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
 
-<button class="btn btn-primary mb-2" @onclick="@(() => Navigation.NavigateTo("/leave-types/create"))">Add Leave Type</button>
 
-@if (leaveTypes == null)
+
+@if (showModal && selectedLeaveType != null)
 {
-    <p><em>Loading...</em></p>
+    <GenericViewModal 
+        Title="Leave Type Details"
+        Fields="GetLeaveTypeFields(selectedLeaveType)"
+        OnClose="CloseDetails" />
 }
-else
+
+@if (showDeleteModal && selectedLeaveTypeToDelete is not null)
 {
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Paid</th>
-                <th>Active</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var type in leaveTypes)
-        {
-            <tr>
-                <td>@type.Name</td>
-                <td>@type.Description</td>
-                <td>@(type.IsPaid ? "Yes" : "No")</td>
-                <td>@(type.IsActive ? "Yes" : "No")</td>
-                <td>
-                    <a href="/leave-types/edit/@type.Id" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="/leave-types/delete/@type.Id" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <DeleteConfirmation TItem="HRP_LeaveType"
+                        Item="selectedLeaveTypeToDelete"
+                        ItemName="@selectedLeaveTypeToDelete.Name"
+                        OnConfirm="ConfirmDeleteAsync"
+                        OnCancel="CancelDelete" />
 }
 
 @code {
-    private List<HRP_LeaveType> leaveTypes;
+    // Data
+    private List<HRP_LeaveType> leaveTypes = new();
+    private HRP_LeaveType? selectedLeaveType;
+    private HRP_LeaveType? selectedLeaveTypeToDelete;
 
+    // UI state
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool showDeleteModal = false;
+
+    // Lifecycle
     protected override async Task OnInitializedAsync()
     {
-        leaveTypes = await LeaveTypeService.GetAllAsync();
+        await LoadLeaveTypesAsync();
+    }
+
+    // Methods
+    private async Task LoadLeaveTypesAsync()
+    {
+        isLoading = true;
+        try
+        {
+            leaveTypes = await LeaveTypeService.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            // Ideally, log the exception or show a notification
+            Console.Error.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateToCreate() =>
+        Navigation.NavigateTo("/leave-types/create");
+
+    private void ShowDetails(HRP_LeaveType type)
+    {
+        selectedLeaveType = type;
+        showModal = true;
+    }
+
+    private void CloseDetails()
+    {
+        selectedLeaveType = null;
+        showModal = false;
+    }
+
+    private void PromptDelete(HRP_LeaveType type)
+    {
+        selectedLeaveTypeToDelete = type;
+        showDeleteModal = true;
+    }
+
+    private void CancelDelete()
+    {
+        selectedLeaveTypeToDelete = null;
+        showDeleteModal = false;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (selectedLeaveTypeToDelete is not null)
+        {
+            try
+            {
+                await LeaveTypeService.DeleteAsync(selectedLeaveTypeToDelete.Id);
+                await LoadLeaveTypesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Handle/log the error
+                Console.Error.WriteLine(ex.Message);
+            }
+            finally
+            {
+                CancelDelete();
+            }
+        }
+    }
+
+    private List<(string Label, string Value)> GetLeaveTypeFields(HRP_LeaveType type)
+    {
+        return new()
+        {
+            ("Name", type.Name),
+            ("Description", type.Description),
+            ("Paid Leave", type.IsPaid ? "Yes" : "No"),
+            ("Status", type.IsActive ? "Active" : "Inactive"),
+        };
     }
 }

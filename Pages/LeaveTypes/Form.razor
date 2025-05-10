@@ -1,0 +1,98 @@
+@page "/leave-types/create"
+@page "/leave-types/edit/{LeaveTypeId:int}"
+
+@inject ILeaveTypeService LeaveTypeService
+@inject NavigationManager Navigation
+
+<PageTitle>@(IsEdit ? $"Edit Leave Type - {LeaveType.Name}" : "Add Leave Type")</PageTitle>
+
+<div class="container py-4">
+    <h3 class="mb-4 text-primary">
+        @(IsEdit ? $"Edit Leave Type - {LeaveType.Name}" : "Add Leave Type")
+    </h3>
+
+    @if (IsEdit && LeaveType == null)
+    {
+        <div class="alert alert-info">Loading leave type...</div>
+    }
+    else
+    {
+        <EditForm Model="LeaveType" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label class="form-label">Name <span class="text-danger">*</span></label>
+                <InputText class="form-control" @bind-Value="LeaveType.Name" />
+                <ValidationMessage For="@(() => LeaveType.Name)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <InputTextArea class="form-control" @bind-Value="LeaveType.Description" />
+                <ValidationMessage For="@(() => LeaveType.Description)" />
+            </div>
+
+            <div class="form-check mb-2">
+                <InputCheckbox class="form-check-input" id="isPaid" @bind-Value="LeaveType.IsPaid" />
+                <label class="form-check-label" for="isPaid">Is Paid</label>
+            </div>
+
+            <div class="form-check mb-4">
+                <InputCheckbox class="form-check-input" id="isActive" @bind-Value="LeaveType.IsActive" />
+                <label class="form-check-label" for="isActive">Is Active</label>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-success me-2">
+                    <i class="bi bi-check-circle me-1"></i> @(IsEdit ? "Update" : "Create")
+                </button>
+                <button type="button" class="btn btn-secondary" @onclick="NavigateBack">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancel
+                </button>
+            </div>
+        </EditForm>
+    }
+</div>
+
+@code {
+    [Parameter] public int? LeaveTypeId { get; set; }
+
+    private HRP_LeaveType LeaveType { get; set; } = new();
+    private bool IsEdit => LeaveTypeId.HasValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsEdit)
+        {
+            var existing = await LeaveTypeService.GetByIdAsync(LeaveTypeId.Value);
+            if (existing is not null)
+            {
+                LeaveType = existing;
+            }
+            else
+            {
+                NavigateBack();
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsEdit)
+        {
+            await LeaveTypeService.UpdateAsync(LeaveType);
+        }
+        else
+        {
+            await LeaveTypeService.AddAsync(LeaveType);
+        }
+
+        NavigateBack();
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/leave-types");
+    }
+}

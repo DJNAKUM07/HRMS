@@ -1,0 +1,43 @@
+@* Reusable Generic View Modal *@
+
+@if (Fields is not null && Fields.Any())
+{
+    <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg rounded-3">
+                <div class="modal-header bg-primary text-white rounded-top">
+                    <h5 class="modal-title">
+                        <i class="bi bi-eye-fill me-2"></i> @Title
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="Close"></button>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="row gy-4 gx-5">
+                        @foreach (var field in Fields)
+                        {
+                            <div class="col-md-6">
+                                <div class="fw-semibold text-muted small mb-1">@field.Label</div>
+                                <div class="fs-5 text-break">@field.Value</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light rounded-bottom">
+                    <button class="btn btn-outline-secondary" @onclick="Close">
+                        <i class="bi bi-x-circle me-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = "Details";
+    [Parameter] public List<(string Label, string? Value)> Fields { get; set; } = new();
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

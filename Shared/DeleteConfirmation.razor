@@ -1,0 +1,26 @@
+@typeparam TItem
+
+<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Confirm Delete</h5>
+                <button type="button" class="btn-close" @onclick="OnCancel" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>@ItemName</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" @onclick="OnCancel">Cancel</button>
+                <button class="btn btn-danger" @onclick="OnConfirm">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public TItem Item { get; set; }
+    [Parameter] public string ItemName { get; set; } = "this item";
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+}
