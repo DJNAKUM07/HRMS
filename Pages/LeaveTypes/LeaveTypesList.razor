@@ -207,7 +207,6 @@
 
     private void CancelDelete()
     {
-        _toastService.ShowInfo("Delete cancelled.");
         SelectedLeaveTypeToDelete = null;
         ShowDeleteModal = false;
     }
@@ -219,7 +218,6 @@
             try
             {
                 await _leaveTypeService.DeleteAsync(SelectedLeaveTypeToDelete.Id);
-                _toastService.ShowSuccess("Leave type deleted.");
             }
             catch (Exception ex)
             {

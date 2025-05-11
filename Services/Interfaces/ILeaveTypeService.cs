@@ -5,11 +5,11 @@ namespace HRMS.UI.Services.Interfaces
     public interface ILeaveTypeService
     {
         Task<List<HRP_LeaveType>> GetAllAsync();
-        Task<HRP_LeaveType> GetByIdAsync(int id);
+        Task<HRP_LeaveType?> GetByIdAsync(int id);
         Task AddAsync(HRP_LeaveType leaveType);
         Task UpdateAsync(HRP_LeaveType leaveType);
         Task DeleteAsync(int id);
-        
+
         Task<List<HRP_LeaveType>> FilterAsync(string? name, string? isPaid, string? isActive);
     }
 }

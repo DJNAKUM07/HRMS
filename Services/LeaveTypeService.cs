@@ -8,37 +8,62 @@ namespace HRMS.UI.Services
     public class LeaveTypeService : ILeaveTypeService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<LeaveTypeService> _logger;
 
-        public LeaveTypeService(ApplicationDbContext context)
+        public LeaveTypeService(ApplicationDbContext context, ILogger<LeaveTypeService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<List<HRP_LeaveType>> GetAllAsync()
-            => await _context.HRP_LeaveType.ToListAsync();
+            => await _context.HRP_LeaveType.OrderBy(x => x.Name).ToListAsync();
 
-        public async Task<HRP_LeaveType> GetByIdAsync(int id)
-            => await _context.HRP_LeaveType.FindAsync(id);
+        public async Task<HRP_LeaveType?> GetByIdAsync(int id)
+            => await _context.HRP_LeaveType.FirstOrDefaultAsync(x => x.Id == id);
 
         public async Task AddAsync(HRP_LeaveType leaveType)
         {
-            _context.HRP_LeaveType.Add(leaveType);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.HRP_LeaveType.Add(leaveType);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding LeaveType");
+                throw;
+            }
         }
 
         public async Task UpdateAsync(HRP_LeaveType leaveType)
         {
-            _context.HRP_LeaveType.Update(leaveType);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.HRP_LeaveType.Update(leaveType);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating LeaveType");
+                throw;
+            }
         }
 
         public async Task DeleteAsync(int id)
         {
             var entity = await _context.HRP_LeaveType.FindAsync(id);
-            if (entity != null)
+            if (entity is null) return;
+
+            try
             {
                 _context.HRP_LeaveType.Remove(entity);
                 await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting LeaveType with Id {id}");
+                throw;
             }
         }
 
