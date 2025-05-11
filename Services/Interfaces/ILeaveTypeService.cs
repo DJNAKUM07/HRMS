@@ -9,5 +9,7 @@ namespace HRMS.UI.Services.Interfaces
         Task AddAsync(HRP_LeaveType leaveType);
         Task UpdateAsync(HRP_LeaveType leaveType);
         Task DeleteAsync(int id);
+        
+        Task<List<HRP_LeaveType>> FilterAsync(string? name, string? isPaid, string? isActive);
     }
 }

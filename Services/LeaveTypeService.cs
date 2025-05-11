@@ -41,5 +41,21 @@ namespace HRMS.UI.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<List<HRP_LeaveType>> FilterAsync(string? name, string? isPaid, string? isActive)
+        {
+            var query = _context.HRP_LeaveType.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
+
+            if (bool.TryParse(isPaid, out var paid))
+                query = query.Where(x => x.IsPaid == paid);
+
+            if (bool.TryParse(isActive, out var active))
+                query = query.Where(x => x.IsActive == active);
+
+            return await query.OrderBy(x => x.Name).ToListAsync();
+        }
     }
 }

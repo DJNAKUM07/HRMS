@@ -24,7 +24,7 @@
             <ValidationSummary />
 
             <div class="mb-3">
-                <label class="form-label">Name <span class="text-danger">*</span></label>
+                <label class="form-label"><span class="text-danger">*</span> Name</label>
                 <InputText class="form-control" @bind-Value="LeaveType.Name" />
                 <ValidationMessage For="@(() => LeaveType.Name)" />
             </div>
@@ -93,7 +93,6 @@
             ToastService.ShowSuccess($"Leave type {LeaveType.Name} created successfully!");
             LeaveType = new HRP_LeaveType();
             StateHasChanged();
-            
         }
     }
 
